@@ -12,78 +12,6 @@ typedef struct Contact {
     int age;
 } Contact;
 
-int countContacts(Contact **contacts);
-
-bool validPhoneNumber(char buffer[]);
-
-Contact *readNewContact();
-
-Contact **appendContact(Contact **contacts, Contact *newContact);
-
-
-int main()
-{
-
-    int option = 0;
-    Contact** addressBook = NULL;
-    Contact** newAddressBook = NULL;
-    const int EXIT_OPTION = 12;
-    const int APPEND_CONTACT_OPTION = 1;
-    
-    while (option != EXIT_OPTION)
-    {
-        printf("Address Book Menu\n1. Append Contact\n2. Insert Contact in Alphabetical Order\n3. Remove Contact by Index\n");
-        printf("4. Remove Contact by Full Name\n5. Find and Edit Contact\n6. List Contacts\n7. Print Contacts to File with the format of an input file\n");
-        printf("8. Print Contacts to File (Human Readable)\n9. Load Contacts from File Replacing Existing Contacts\n10. Append Contacts from File\n");
-        printf("11. Merge Contacts from File\n12. Exit\n");
-        printf("Choose an option: ");
-        scanf("%d", &option);
-
-        /* change to use case statements*/
-        switch(option)
-        {
-            case APPEND_CONTACT_OPTION:
-                if (addressBook == NULL)
-                {
-                    addressBook = (Contact**)malloc(sizeof(Contact*));
-                    if (addressBook == NULL)
-                    {
-                        fprintf(stderr, "ERROR allocating memory");
-                        return 1;
-                    }
-                }
-                newAddressBook = (Contact**)realloc(addressBook, sizeof(Contact*) * countContacts(addressBook) + 2);
-                
-        }
-        if (option == APPEND_CONTACT_OPTION)
-        {
-            if (addressBook == NULL)
-            {
-                addressBook = (Contact**)malloc(sizeof(Contact*));
-                if (addressBook == NULL)
-                {
-                    fprintf(stderr, "ERROR allocating memory");
-                    return 1;
-                }
-            }
-
-        }
-        return 0;
-    }
-
-
-}
-
-int countContacts(Contact **contacts)
-{
-    int count = 0;
-    while (contacts[count] != NULL)
-    {
-        count += 1;
-    }
-    return count;
-}
-
 bool validPhoneNumber(char buffer[])
 {
     if (strlen(buffer) != 10 || buffer[0] == '0')
@@ -98,7 +26,7 @@ bool validPhoneNumber(char buffer[])
         }
     }
     return true;
-}
+};
 
 Contact *readNewContact()
 {
@@ -146,7 +74,7 @@ Contact *readNewContact()
     strcpy(myAddress, buffer);
 
     printf("Enter 10-digit phone number that must not start with 0: ");
-    fscanf(stdin, " 99[^\n]", buffer);
+    fscanf(stdin, " %99[^\n]", buffer);
     while (!validPhoneNumber(buffer) && attempts < MAX_ATTEMPTS)
     {
         printf("Error: Invalid phone number. Try again: ");
@@ -203,41 +131,40 @@ Contact *readNewContact()
     return newContact;
 }
 
-Contact **appendContact(Contact **contacts, Contact *newContact)
-{
-    Contact** newContacts = NULL;
-    int numContacts = 0;
-
-    /*
-    creates a new contacts if it doesn't already exist
-    */
-    if (contacts == NULL || newContact == NULL)
-    {
-        newContacts = (Contact**)malloc(sizeof(Contact*)*2);
-        if (newContacts == NULL)
-        {
-        fprintf(stderr, "Memory reallocation error in appendContact");
-        return contacts;
-        }
+// Function to print a Contact
+void printContact(const Contact *c) {
+    if (!c) {
+        printf("Invalid contact.\n");
+        return;
     }
-    /*
-    adds an extra space to contacts
-    */
-    else
-    {    
-        numContacts = countContacts(contacts);
-
-        newContacts = (Contact**)realloc(contacts, (numContacts + 2) * sizeof(Contact*));
-        if (newContacts == NULL)
-        {
-            fprintf(stderr, "Memory reallocation error in appendContact");
-            return contacts;
-        }
-    }
-    newContacts[numContacts] = newContact;
-    newContacts[numContacts + 1] = NULL;
-    contacts = newContacts;
-    printf("Contact appended successfully by appendContact");
-    return contacts;
+    printf("\n--- Contact Information ---\n");
+    printf("First Name: %s\n", c->firstName);
+    printf("Family Name: %s\n", c->familyName);
+    printf("Address: %s\n", c->address);
+    printf("Phone Number: %lld\n", c->phonNum);
+    printf("Age: %d\n", c->age);
 }
 
+// Function to free memory allocated for a Contact
+void freeContact(Contact *c) {
+    if (!c) return;
+    free(c->firstName);
+    free(c->familyName);
+    free(c->address);
+    free(c);
+};
+
+
+
+
+// Main function to test the program
+int main() {
+    Contact *contact = readNewContact();
+    if (contact) {
+        printContact(contact);
+        freeContact(contact);
+    } else {
+        printf("Failed to create contact.\n");
+    }
+    return 0;
+}
