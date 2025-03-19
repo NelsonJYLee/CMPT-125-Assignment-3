@@ -28,6 +28,8 @@ int removeContactByFullName(Contact** contacts);
 
 void listContacts(Contact** contacts);
 
+void saveContactsToFile(Contact** contacts, char* filename);
+
 
 int main()
 {
@@ -396,6 +398,39 @@ void listContacts(Contact** contacts)
             printf("   Age: %d\n", contacts[i]->age);
         }
     }
+}
+
+void saveContactsToFile(Contact** contacts, char* filename)
+{
+    FILE* outputStream = NULL;
+    int numContacts = countContacts(contacts);
+
+    if (filename == NULL)
+    {
+        fprintf(stderr, "Error: filename formal parameter passed value NULL in saveContactsToFile");
+        return;
+    }
+
+    if (contacts == NULL)
+    {
+        printf(stderr, "Error: addressBook formal parameter passed value NULL in saveContactsToFile");
+        return;
+    }
+
+    outputStream = fopen(filename, "w");
+    if (outputStream == NULL)
+    {
+        fprintf(stderr, "Error file not opended in saveContactsTofile");
+        return;
+    }
+
+    for (int i = 0; i < numContacts; i++)
+    {
+        fprintf(outputStream, "%s\n%s\n%s\n%lld\n%d\n", contacts[i]->firstName, contacts[i]->familyName, contacts[i]->address, contacts[i]->phonNum, contacts[i]->age);
+    }
+
+    fclose(outputStream);
+    return;
 }
 
 

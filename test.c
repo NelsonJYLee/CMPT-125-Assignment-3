@@ -330,18 +330,49 @@ void listContacts(Contact** contacts)
     }
 }
 
+void saveContactsToFile(Contact** contacts, char* filename)
+{
+    FILE* outputStream = NULL;
+    int numContacts = countContacts(contacts);
+
+    if (filename == NULL)
+    {
+        fprintf(stderr, "Error: filename formal parameter passed value NULL in saveContactsToFile");
+        return;
+    }
+
+    if (contacts == NULL)
+    {
+        fprintf(stderr, "Error: addressBook formal parameter passed value NULL in saveContactsToFile");
+        return;
+    }
+
+    outputStream = fopen(filename, "w");
+    if (outputStream == NULL)
+    {
+        fprintf(stderr, "Error file not opended in saveContactsTofile");
+        return;
+    }
+
+    for (int i = 0; i < numContacts; i++)
+    {
+        fprintf(outputStream, "%s\n%s\n%s\n%lld\n%d\n", contacts[i]->firstName, contacts[i]->familyName, contacts[i]->address, contacts[i]->phonNum, contacts[i]->age);
+    }
+
+    fclose(outputStream);
+    return;
+}
+
 
 // Main function to test the program
 int main() {
-
+    char outputName[100] = "output.txt";
     Contact** addressBook = NULL;
     addressBook = appendContact(addressBook, readNewContact());
     addressBook = appendContact(addressBook, readNewContact());
     listContacts(addressBook);
 
-    removeContactByFullName(addressBook);
-
-    listContacts(addressBook);
+    saveContactsToFile(addressBook, outputName);
 
     for (int i = 0; i < countContacts(addressBook); i++)
     {
