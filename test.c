@@ -28,6 +28,16 @@ bool validPhoneNumber(char buffer[])
     return true;
 };
 
+int countContacts(Contact **contacts)
+{
+    int count = 0;
+    while (contacts[count] != NULL)
+    {
+        count += 1;
+    }
+    return count;
+}
+
 Contact *readNewContact()
 {
     char buffer[100] = {'\0'};
@@ -154,17 +164,111 @@ void freeContact(Contact *c) {
     free(c);
 };
 
+Contact** appendContact(Contact **contacts, Contact *newContact)
+{
+    Contact** newContacts = NULL;
+    int numContacts = 0;
+
+    /*
+    creates a new contacts if it doesn't already exist
+    */
+    if (contacts == NULL || newContact == NULL)
+    {
+        newContacts = (Contact**)malloc(sizeof(Contact*)*2);
+        if (newContacts == NULL)
+        {
+        fprintf(stderr, "Memory reallocation error in appendContact");
+        return contacts;
+        }
+    }
+    /*
+    adds an extra space to contacts
+    */
+    else
+    {    
+        numContacts = countContacts(contacts);
+
+        newContacts = (Contact**)realloc(contacts, (numContacts + 2) * sizeof(Contact*));
+        if (newContacts == NULL)
+        {
+            fprintf(stderr, "Memory reallocation error in appendContact");
+            return contacts;
+        }
+    }
+    newContacts[numContacts] = newContact;
+    newContacts[numContacts + 1] = NULL;
+    contacts = newContacts;
+    printf("Contact appended successfully by appendContact");
+    return contacts;
+}
+
+Contact** removeContactByIndex(Contact** contacts)
+{
+    int index = 0;
+    int originalSizeContacts = countContacts(contacts);
+    Contact** newContacts = NULL;
+    if (contacts == NULL)
+    {
+        fprintf(stderr, "Error: value of addressBook received in removeContactByIndex was NULL");
+        return NULL;
+    }
+
+    printf("Removing a Contact by index\n");
+    printf("Enter index to remove (0 based): ");
+    if (scanf("%d", &index) != 1)
+    {
+        fprintf(stderr, "Error: Value of index supplied could not be read.");
+        return contacts;
+    }
+
+    if (!(0 <= index && index < originalSizeContacts))
+    {
+        fprintf(stderr, "Error: Index out of range in removeContactByIndex");
+        return contacts;
+    }
+
+    freeContact(contacts[index]);
+
+    for (int i = index; i < originalSizeContacts - 1; i ++)
+    {
+        contacts[i] = contacts[i+1];
+    }
+
+    contacts[originalSizeContacts - 1] = NULL;
+
+    newContacts = (Contact**)realloc(contacts, originalSizeContacts * sizeof(Contact*));
+
+    if (newContacts == NULL)
+    {
+        fprintf(stderr, "Error: Memory reallocation failed in removeContactByIndex");
+        return contacts;
+    }
+
+    printf("Contact removed successfully by removeContactByIndex");
+
+    contacts = newContacts;
+
+    return contacts;
+
+}
+
 
 
 
 // Main function to test the program
 int main() {
+
     Contact *contact = readNewContact();
-    if (contact) {
-        printContact(contact);
-        freeContact(contact);
-    } else {
-        printf("Failed to create contact.\n");
-    }
+    Contact** addressBook = NULL;
+    Contact** newAddressBook = appendContact(addressBook, contact);
+    addressBook = newAddressBook;
+    printf("\ncount before removal: %d\n", countContacts(addressBook));
+
+    newAddressBook = removeContactByIndex(addressBook);
+    addressBook = newAddressBook;
+    printf("count after removal: %d\n", countContacts(addressBook));
+
+
+    
     return 0;
 }
