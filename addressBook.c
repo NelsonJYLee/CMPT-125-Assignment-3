@@ -26,6 +26,8 @@ Contact** removeContactByIndex(Contact** contacts);
 
 int removeContactByFullName(Contact** contacts);
 
+void listContacts(Contact** contacts);
+
 
 int main()
 {
@@ -35,6 +37,18 @@ int main()
     Contact** newAddressBook = NULL;
     const int EXIT_OPTION = 12;
     const int APPEND_CONTACT_OPTION = 1;
+
+    /*
+    start by adding the NULL ending to the array
+    */
+
+    addressBook = (Contact**)malloc(sizeof(Contact*));
+    if (addressBook == NULL)
+    {
+        fprintf(stderr, "Could not allocate address book");
+        return 1;
+    }
+    addressBook[0] = NULL;
     
     while (option != EXIT_OPTION)
     {
@@ -243,7 +257,7 @@ Contact** appendContact(Contact **contacts, Contact *newContact)
     newContacts[numContacts] = newContact;
     newContacts[numContacts + 1] = NULL;
     contacts = newContacts;
-    printf("Contact appended successfully by appendContact");
+    printf("Contact appended successfully by appendContact\n");
     return contacts;
 }
 
@@ -321,7 +335,7 @@ int removeContactByFullName(Contact** contacts)
 
     printf("Enter first name: ");
     scanf("%s", firstName);
-    printf("Enter family name:");
+    printf("Enter family name: ");
     scanf("%s", familyName);
 
     /*
@@ -357,10 +371,33 @@ int removeContactByFullName(Contact** contacts)
         fprintf(stderr, "Error: Memory reallocation failed in removeContactByFullName");
         return 2;
     }
+    
+    contacts = newContacts;
 
-    printf("Contact '%s %s' removed successfully", firstName, familyName);
+    printf("Contact '%s %s' removed successfully\n", firstName, familyName);
     return 1;
 }
+
+void listContacts(Contact** contacts)
+{
+    int numContacts = countContacts(contacts);
+
+    if (numContacts == 0)
+    {
+        printf("No contacts available.\n");
+    }
+    else
+    {
+        for (int i = 0; i < numContacts; i++)
+        {
+            printf("%d. %s\n", i + 1, contacts[i]->firstName);
+            printf("   Phone: %lld\n", contacts[i]->phonNum);
+            printf("   Address: %s\n", contacts[i]->address);
+            printf("   Age: %d\n", contacts[i]->age);
+        }
+    }
+}
+
 
 
 

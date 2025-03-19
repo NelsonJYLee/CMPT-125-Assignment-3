@@ -198,7 +198,7 @@ Contact** appendContact(Contact **contacts, Contact *newContact)
     newContacts[numContacts] = newContact;
     newContacts[numContacts + 1] = NULL;
     contacts = newContacts;
-    printf("Contact appended successfully by appendContact");
+    printf("Contact appended successfully by appendContact\n");
     return contacts;
 }
 
@@ -249,26 +249,106 @@ Contact** removeContactByIndex(Contact** contacts)
     contacts = newContacts;
 
     return contacts;
-
 }
 
+int removeContactByFullName(Contact** contacts)
+{
+    char firstName[100] = {"\0"};
+    char familyName[100] = {"\0"};
+    int index = 0;
+    int contactsSize = countContacts(contacts);
+    Contact** newContacts = NULL;
+    
+    if (contacts == NULL)
+    {
+        fprintf(stderr, "Error: value of contacts received in removeContactByFullName was NULL");
+        return 0;
+    }
 
+    printf("Enter first name: ");
+    scanf("%s", firstName);
+    printf("Enter family name: ");
+    scanf("%s", familyName);
+
+    /*
+    find matching first and family names
+    */
+    while (index < contactsSize)
+    {
+        if (strcmp(contacts[index]->firstName, firstName) == 0 && strcmp(contacts[index]->familyName, familyName) == 0)
+        {
+            break;
+        }
+        index += 1;
+    }
+    
+    if  (index == contactsSize)
+    {
+        printf("Contact '%s %s' not found", firstName, familyName);
+        return 2;
+    }
+    
+    freeContact(contacts[index]);
+    for (int i = index; i < contactsSize - 1; i++)
+    {
+        contacts[i] = contacts[i + 1];
+    }
+
+    contacts[contactsSize - 1] = NULL;
+
+    newContacts = (Contact**)realloc(contacts, contactsSize * sizeof(Contact*));
+
+    if (newContacts == NULL)
+    {
+        fprintf(stderr, "Error: Memory reallocation failed in removeContactByFullName");
+        return 2;
+    }
+
+    contacts = newContacts;
+
+    printf("Contact '%s %s' removed successfully\n", firstName, familyName);
+    return 1;
+}
+
+void listContacts(Contact** contacts)
+{
+    int numContacts = countContacts(contacts);
+
+    if (numContacts == 0)
+    {
+        printf("No contacts available.\n");
+    }
+    else
+    {
+        for (int i = 0; i < numContacts; i++)
+        {
+            printf("%d. %s\n", i + 1, contacts[i]->firstName);
+            printf("   Phone: %lld\n", contacts[i]->phonNum);
+            printf("   Address: %s\n", contacts[i]->address);
+            printf("   Age: %d\n", contacts[i]->age);
+        }
+    }
+}
 
 
 // Main function to test the program
 int main() {
 
-    Contact *contact = readNewContact();
     Contact** addressBook = NULL;
-    Contact** newAddressBook = appendContact(addressBook, contact);
-    addressBook = newAddressBook;
-    printf("\ncount before removal: %d\n", countContacts(addressBook));
+    addressBook = appendContact(addressBook, readNewContact());
+    addressBook = appendContact(addressBook, readNewContact());
+    listContacts(addressBook);
 
-    newAddressBook = removeContactByIndex(addressBook);
-    addressBook = newAddressBook;
-    printf("count after removal: %d\n", countContacts(addressBook));
+    removeContactByFullName(addressBook);
 
+    listContacts(addressBook);
 
-    
+    for (int i = 0; i < countContacts(addressBook); i++)
+    {
+        freeContact(addressBook[i]);
+    }
+
+    free(addressBook);
+
     return 0;
 }
