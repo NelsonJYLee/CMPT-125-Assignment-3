@@ -36,7 +36,11 @@ void printContactsToFile(Contact** contacts, char* filename);
 
 Contact** loadContactsFromFile(Contact** addressBook, char* filename);
 
-Contact** appendContactsFromFile(Contact** contacts, char* filename); 
+Contact** appendContactsFromFile(Contact** contacts, char* filename);
+
+void InsertionSort(Contact** contacts);
+
+Contact **mergeContactsFromFile(Contact** contacts, char* filename);
 
 int main()
 {
@@ -806,7 +810,35 @@ Contact** appendContactsFromFile(Contact** contacts, char* filename)
         contacts = newAddressBook;
     }
 
+    printf("Appeneded contacts from %s\n", filename);
     return contacts;
+}
+
+void InsertionSort(Contact** contacts)
+{
+    int n  = countContacts(contacts);
+    for (int i = 1; i < n; i++)
+    {
+        char* key1 = contacts[i]->familyName;
+        char* key2 = contacts[i]->firstName;
+        Contact* key = contacts[i];
+
+        int j = i - 1;
+
+        while (j>= 0 && (strcmp(contacts[j]->familyName, key1) > 0 || (strcmp(contacts[j]->familyName, key1) == 0 && strcmp(contacts[j]->firstName, key2) > 0)))
+        {
+            contacts[j + 1] = contacts[j];
+            j--;
+        }
+        contacts[j + 1] = key;
+    }
+}
+
+Contact **mergeContactsFromFile(Contact** contacts, char* filename)
+{
+    /*sort the current contacts*/
+
+
 }
 
 

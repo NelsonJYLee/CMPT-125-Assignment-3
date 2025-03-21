@@ -723,7 +723,28 @@ Contact** appendContactsFromFile(Contact** contacts, char* filename)
         contacts = newAddressBook;
     }
 
+    printf("Appeneded contacts from %s\n", filename);
     return contacts;
+}
+
+void InsertionSort(Contact** contacts)
+{
+    int n  = countContacts(contacts);
+    for (int i = 1; i < n; i++)
+    {
+        char* key1 = contacts[i]->familyName;
+        char* key2 = contacts[i]->firstName;
+        Contact* key = contacts[i];
+
+        int j = i - 1;
+
+        while (j>= 0 && (strcmp(contacts[j]->familyName, key1) > 0 || (strcmp(contacts[j]->familyName, key1) == 0 && strcmp(contacts[j]->firstName, key2) > 0)))
+        {
+            contacts[j + 1] = contacts[j];
+            j--;
+        }
+        contacts[j + 1] = key;
+    }
 }
 
 
@@ -733,12 +754,14 @@ int main() {
     Contact** addressBook = NULL;
 
     addressBook = appendContact(addressBook, readNewContact());
-
-    addressBook = appendContactsFromFile(addressBook, "output.txt");
+    addressBook = appendContact(addressBook, readNewContact());
+    addressBook = appendContact(addressBook, readNewContact());
 
     listContacts(addressBook);
 
-    saveContactsToFile(addressBook, "output3.txt");
+    InsertionSort(addressBook);
+
+    listContacts(addressBook);
 
     for (int i = 0; i < countContacts(addressBook); i++)
     {
