@@ -586,6 +586,121 @@ Contact** loadContactsFromFile(Contact** addressBook, char* filename)
     return addressBook;
 }
 
+Contact** appendContactsFromFile(Contact** contacts, char* filename)
+{
+    FILE* inputStream = NULL;
+    Contact* newContact = NULL;
+    Contact** newContacts = NULL;
+    char getBuffer[100] = {"\0"};
+    char scanBuffer[100] = {"\0"};
+    int numContacts = 0;
+    char* myFirstName = NULL;
+    char* myFamilyName = NULL;
+    char* myAddress = NULL;
+    long long myPhoneNumber = 0;
+    int myAge = 0;
+    
+    inputStream = fopen(filename, "r");
+    if (inputStream == NULL)
+    {
+        fprintf(stderr, "Error: File to load not found");
+        return NULL;
+    }
+
+    fgets(getBuffer, sizeof(getBuffer), inputStream);
+    if (sscanf(getBuffer, "%d", &numContacts) != 1)
+    {
+        fprintf(stderr, "Error: failed to get number of contacts in file");
+        fclose(inputStream);
+        return NULL;
+    }
+
+    for (int i = 0; i < numContacts; i++)
+    {
+        newContact = (Contact*)malloc(sizeof(Contact));
+        if (newContact == NULL)
+        {
+            fprintf(stderr, "Error: Memory allocation error, Contact %d in loadContactsFromFile", i);
+            fclose(inputStream);
+            return NULL;
+        }
+
+        /*firstName*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%99[^\n]", scanBuffer);
+        myFirstName = (char*)calloc((strlen(scanBuffer) + 1), sizeof(char));
+        if (myFirstName == NULL)
+        {
+            fprintf(stderr, "Error: Memory allocation error, memory for string in Contact %d not allocated", i);
+            free(newContact);
+            fclose(inputStream);
+            return NULL;
+        }
+        strcpy(myFirstName, scanBuffer);
+        newContact->firstName = myFirstName;
+
+        /*familyName*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%99[^\n]", scanBuffer);
+        myFamilyName = (char*)calloc((strlen(scanBuffer) + 1), sizeof(char));
+        if (myFamilyName == NULL)
+        {
+            fprintf(stderr, "Error: Memory allocation error, memory for string in Contact %d not allocated", i);
+            free(myFirstName);
+            free(newContact);
+            fclose(inputStream);
+            return NULL;
+        }
+        strcpy(myFamilyName, scanBuffer);
+        newContact->familyName = myFamilyName;
+
+        /*address*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%99[^\n]", scanBuffer);
+        myAddress = (char*)calloc((strlen(scanBuffer) + 1), sizeof(char));
+        if (myAddress == NULL)
+        {
+            fprintf(stderr, "Error: Memory allocation error, memory for string in Contact %d not allocated", i);
+            free(myFirstName);
+            free(myFamilyName);
+            free(newContact);
+            fclose(inputStream);
+            return NULL;
+        }
+        strcpy(myAddress, scanBuffer);
+        newContact->address = myAddress;
+
+        /*phoneNumber*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%99[^\n]", scanBuffer);
+        if (!(validPhoneNumber(scanBuffer)))
+        {
+            fprintf(stderr, "Error: Invalid phone number.");
+            myPhoneNumber = 0;
+        }
+        else
+        {
+            myPhoneNumber = atoll(scanBuffer);
+        }
+        newContact->phonNum = myPhoneNumber;
+
+        /*age*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%d", &myAge);
+        if (!(myAge >= 1 && myAge <= 150))
+        {
+            fprintf(stderr, "Error: Invalid age.");
+            myAge = 0;
+        }
+        newContact->age = myAge;
+        
+        newContacts = appendContact(contacts, newContact);
+        contacts = newContacts;
+    }
+
+    return contacts;
+}
+
 
 // Main function to test the program
 int main() {
@@ -597,6 +712,12 @@ int main() {
     listContacts(addressBook);
 
     saveContactsToFile(addressBook, "output2.txt");
+
+    addressBook = appendContactsFromFile(addressBook, "output.txt");
+
+    listContacts(addressBook);
+
+    saveContactsToFile(addressBook, "output3.txt");
 
     for (int i = 0; i < countContacts(addressBook); i++)
     {
