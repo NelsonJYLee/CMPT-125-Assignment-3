@@ -747,11 +747,142 @@ void InsertionSort(Contact** contacts)
     }
 }
 
+Contact **mergeContactsFromFile(Contact** contacts, char* filename)
+{
+    FILE* inputStream = NULL;
+    Contact* newContact = NULL;
+    Contact** newAddressBook = NULL;
+    char getBuffer[100] = {"\0"};
+    char scanBuffer[100] = {"\0"};
+    int numContacts = 0;
+    char* myFirstName = NULL;
+    char* myFamilyName = NULL;
+    char* myAddress = NULL;
+    long long myPhoneNumber = 0;
+    int myAge = 0;
+
+    /*sort the current contacts*/
+    InsertionSort(contacts);
+
+    /*read and place contacts from file in a sorted manner*/
+    inputStream = fopen(filename, "r");
+    if (inputStream == NULL)
+    {
+        fprintf(stderr, "Error: File to load not found");
+        return NULL;
+    }
+
+    fgets(getBuffer, sizeof(getBuffer), inputStream);
+    if (sscanf(getBuffer, "%d", &numContacts) != 1)
+    {
+        fprintf(stderr, "Error: failed to get number of contacts in file");
+        fclose(inputStream);
+        return NULL;
+    }
+
+    for (int i = 0; i < numContacts; i++)
+    {
+        newContact = (Contact*)malloc(sizeof(Contact));
+        if (newContact == NULL)
+        {
+            fprintf(stderr, "Error: Memory allocation error, Contact %d in loadContactsFromFile", i);
+            fclose(inputStream);
+            return NULL;
+        }
+
+        /*firstName*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%99[^\n]", scanBuffer);
+        myFirstName = (char*)calloc((strlen(scanBuffer) + 1), sizeof(char));
+        if (myFirstName == NULL)
+        {
+            fprintf(stderr, "Error: Memory allocation error, memory for string in Contact %d not allocated", i);
+            free(newContact);
+            fclose(inputStream);
+            return NULL;
+        }
+        strcpy(myFirstName, scanBuffer);
+        newContact->firstName = myFirstName;
+
+        /*familyName*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%99[^\n]", scanBuffer);
+        myFamilyName = (char*)calloc((strlen(scanBuffer) + 1), sizeof(char));
+        if (myFamilyName == NULL)
+        {
+            fprintf(stderr, "Error: Memory allocation error, memory for string in Contact %d not allocated", i);
+            free(myFirstName);
+            free(newContact);
+            fclose(inputStream);
+            return NULL;
+        }
+        strcpy(myFamilyName, scanBuffer);
+        newContact->familyName = myFamilyName;
+
+        /*address*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%99[^\n]", scanBuffer);
+        myAddress = (char*)calloc((strlen(scanBuffer) + 1), sizeof(char));
+        if (myAddress == NULL)
+        {
+            fprintf(stderr, "Error: Memory allocation error, memory for string in Contact %d not allocated", i);
+            free(myFirstName);
+            free(myFamilyName);
+            free(newContact);
+            fclose(inputStream);
+            return NULL;
+        }
+        strcpy(myAddress, scanBuffer);
+        newContact->address = myAddress;
+
+        /*phoneNumber*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%99[^\n]", scanBuffer);
+        if (!(validPhoneNumber(scanBuffer)))
+        {
+            fprintf(stderr, "Error: Invalid phone number.");
+            myPhoneNumber = 0;
+        }
+        else
+        {
+            myPhoneNumber = atoll(scanBuffer);
+        }
+        newContact->phonNum = myPhoneNumber;
+
+        /*age*/
+        fgets(getBuffer, sizeof(getBuffer), inputStream);
+        sscanf(getBuffer, "%d", &myAge);
+        if (!(myAge >= 1 && myAge <= 150))
+        {
+            fprintf(stderr, "Error: Invalid age.");
+            myAge = 0;
+        }
+        newContact->age = myAge;
+
+        /*check to see if this name is already in the book*/
+        if (nameInBook(myFirstName, myFamilyName, contacts))
+        {
+            printf("Duplicate Contact detected\n");
+            free(myFirstName);
+            free(myFamilyName);
+            free(myAddress);
+            free(newContact);
+            continue;
+        }
+
+        newAddressBook = insertContactAlphabetical(contacts, newContact);
+        contacts = newAddressBook;
+    }
+    printf("Appended contacts from %s\n", filename);
+    return contacts;
+}
+
 
 
 // Main function to test the program
 int main() {
     Contact** addressBook = NULL;
+    char* inputFileName = "output.txt";
 
     addressBook = appendContact(addressBook, readNewContact());
     addressBook = appendContact(addressBook, readNewContact());
@@ -759,7 +890,7 @@ int main() {
 
     listContacts(addressBook);
 
-    InsertionSort(addressBook);
+    addressBook = mergeContactsFromFile(addressBook, inputFileName);
 
     listContacts(addressBook);
 
