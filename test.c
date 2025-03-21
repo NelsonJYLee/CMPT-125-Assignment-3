@@ -202,6 +202,52 @@ Contact** appendContact(Contact **contacts, Contact *newContact)
     return contacts;
 }
 
+Contact** insertContactAlphabetical(Contact** contacts, Contact* newContact)
+{
+    /*requires an non-NULL contacts*/
+	int numContacts = countContacts(contacts);
+	Contact** newContacts = NULL;
+	int index = 0;
+	if (newContact == NULL)
+	{
+		return contacts;
+	}
+	
+	newContacts = (Contact**)realloc(contacts, (numContacts + 2) * sizeof(Contact*));
+	if (newContacts == NULL)
+	{
+		fprintf(stderr, "Error: Memory reallocation error in insertContactAlphabetical");
+		return contacts;
+	}
+	newContacts[numContacts + 1] = NULL;
+
+
+	/*find the correct index to place newContact*/
+    if (numContacts != 0)
+    {
+        while (strcmp(newContact->familyName, newContacts[index]->familyName) > 0 || (strcmp(newContact->familyName, newContacts[index]->familyName) == 0 && strcmp(newContact->firstName, newContacts[index]->firstName) > 0))
+        {
+            index += 1;
+        }
+        
+        /*move all contacts down by one index*/
+        for (int i = numContacts; i > index; i--)
+        {
+            newContacts[i] = newContacts[i-1];
+        }
+    }
+
+
+	/*place contact at the index*/
+	newContacts[index] = newContact;
+
+	contacts = newContacts;
+
+	printf("Contact was successfully added in alphabetical order\n");
+
+	return contacts;
+}
+
 Contact** removeContactByIndex(Contact** contacts)
 {
     int index = 0;
@@ -543,9 +589,11 @@ Contact** loadContactsFromFile(Contact** addressBook, char* filename)
 
 // Main function to test the program
 int main() {
-    char outputName[100] = "output.txt";
-    Contact** addressBook = NULL;
-    addressBook = loadContactsFromFile(addressBook, outputName);
+    Contact** addressBook = (Contact**)malloc(sizeof(Contact*));
+    addressBook = insertContactAlphabetical(addressBook, readNewContact());
+    addressBook = insertContactAlphabetical(addressBook, readNewContact());
+    addressBook = insertContactAlphabetical(addressBook, readNewContact());
+
     listContacts(addressBook);
 
     saveContactsToFile(addressBook, "output2.txt");
