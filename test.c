@@ -322,7 +322,7 @@ void listContacts(Contact** contacts)
     {
         for (int i = 0; i < numContacts; i++)
         {
-            printf("%d. %s\n", i + 1, contacts[i]->firstName);
+            printf("%d. %s %s\n", i + 1, contacts[i]->firstName, contacts[i]->familyName);
             printf("   Phone: %lld\n", contacts[i]->phonNum);
             printf("   Address: %s\n", contacts[i]->address);
             printf("   Age: %d\n", contacts[i]->age);
@@ -353,13 +353,51 @@ void saveContactsToFile(Contact** contacts, char* filename)
         fprintf(stderr, "Error file not opended in saveContactsTofile");
         return;
     }
-
+    fprintf(outputStream, "%d\n", numContacts);
     for (int i = 0; i < numContacts; i++)
     {
         fprintf(outputStream, "%s\n%s\n%s\n%lld\n%d\n", contacts[i]->firstName, contacts[i]->familyName, contacts[i]->address, contacts[i]->phonNum, contacts[i]->age);
     }
 
     fclose(outputStream);
+    return;
+}
+
+void printContactsToFile(Contact** contacts, char* filename)
+{
+    FILE* outputStream = NULL;
+    int numContacts = countContacts(contacts);
+
+    if (filename == NULL)
+    {
+        fprintf(stderr, "Error: filename formal parameter passed value NULL in printContactsToFile");
+        return;
+    }
+
+    if (contacts == NULL)
+    {
+        fprintf(stderr, "Error: addressBook formal parameter passed value NULL in printContactsToFile");
+        return;
+    }
+
+    outputStream = fopen(filename, "w");
+    if (outputStream == NULL)
+    {
+        fprintf(stderr, "Error: file not opened in printContactsToFile");
+        return;
+    }
+
+    fprintf(outputStream, "Address Book Report\n-------------------\n");
+    for (int i = 0; i < numContacts; i++)
+    {
+        fprintf(outputStream, "%d. %s %s\n", i + 1, contacts[i]->firstName, contacts[i]->familyName);
+        fprintf(outputStream, "   Phone: %lld\n", contacts[i]->phonNum);
+        fprintf(outputStream, "   Address: %s\n", contacts[i]->address);
+        fprintf(outputStream, "   Age: %d\n", contacts[i]->age);
+    }
+    fprintf(outputStream, "-------------------\n");
+    fprintf(outputStream, "Total Contacts: %d", numContacts);
+
     return;
 }
 
