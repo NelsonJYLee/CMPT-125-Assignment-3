@@ -36,6 +36,8 @@ void printContactsToFile(Contact** contacts, char* filename);
 
 Contact** loadContactsFromFile(Contact** addressBook, char* filename);
 
+Contact** appendContactsFromFile(Contact** contacts, char* filename); 
+
 int main()
 {
 
@@ -291,7 +293,7 @@ Contact** insertContactAlphabetical(Contact** contacts, Contact* newContact)
 	/*find the correct index to place newContact*/
     if (numContacts != 0)
     {
-        while (strcmp(newContact->familyName, newContacts[index]->familyName) > 0 || (strcmp(newContact->familyName, newContacts[index]->familyName) == 0 && strcmp(newContact->firstName, newContacts[index]->firstName) > 0))
+        while (index < numContacts && (strcmp(newContact->familyName, newContacts[index]->familyName) > 0 || (strcmp(newContact->familyName, newContacts[index]->familyName) == 0 && strcmp(newContact->firstName, newContacts[index]->firstName) > 0)))
         {
             index += 1;
         }
@@ -555,8 +557,7 @@ Contact** loadContactsFromFile(Contact** addressBook, char* filename)
         fprintf(stderr, "Error: File to load not found");
         return NULL;
     }
-    /*make sure this WORKS!
-    then scan every attribute for every contact input, dynamically allocate memory for the attributers, and append it to the contract list*/
+
     fgets(getBuffer, sizeof(getBuffer), inputStream);
     if (sscanf(getBuffer, "%d", &numContacts) != 1)
     {
@@ -661,6 +662,36 @@ Contact** loadContactsFromFile(Contact** addressBook, char* filename)
     printf("Contacts loaded from file: %s\n", filename);
     fclose(inputStream);
     return addressBook;
+}
+
+Contact** appendContactsFromFile(Contact** contacts, char* filename)
+{
+    FILE* inputStream = NULL;
+    int numContacts = 0;
+    char getBuffer[100] = {"\0"};
+    char scanBuffer[100] = {"\0"};
+    char* myFirstName = NULL;
+    char* myFamilyName = NULL;
+    char* myAddress = NULL;
+    long long myPhoneNumber = 0;
+    int myAge = 0;
+
+    
+
+    fgets(getBuffer, sizeof(getBuffer), inputStream);
+    if (sscanf(getBuffer, "%d", &numContacts) != 1)
+    {
+        fprintf(stderr, "Failed to read number of contacts in input file");
+        fclose(inputStream);
+        return NULL;
+    }
+
+
+
+
+
+    inputStream = fopen(filename, "r");
+
 }
 
 

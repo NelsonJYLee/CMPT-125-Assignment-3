@@ -225,7 +225,7 @@ Contact** insertContactAlphabetical(Contact** contacts, Contact* newContact)
 	/*find the correct index to place newContact*/
     if (numContacts != 0)
     {
-        while (strcmp(newContact->familyName, newContacts[index]->familyName) > 0 || (strcmp(newContact->familyName, newContacts[index]->familyName) == 0 && strcmp(newContact->firstName, newContacts[index]->firstName) > 0))
+        while (index < numContacts && (strcmp(newContact->familyName, newContacts[index]->familyName) > 0 || (strcmp(newContact->familyName, newContacts[index]->familyName) == 0 && strcmp(newContact->firstName, newContacts[index]->firstName) > 0)))
         {
             index += 1;
         }
