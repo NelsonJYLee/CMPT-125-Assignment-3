@@ -586,11 +586,25 @@ Contact** loadContactsFromFile(Contact** addressBook, char* filename)
     return addressBook;
 }
 
+bool nameInBook(char* firstName, char* familyName, Contact** addressBook)
+{
+    int numContacts = countContacts(addressBook);
+
+    for (int i = 0; i < numContacts; i++)
+    {
+        if (strcmp(addressBook[i]->firstName, firstName) == 0 && strcmp(addressBook[i]->familyName, familyName) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 Contact** appendContactsFromFile(Contact** contacts, char* filename)
 {
     FILE* inputStream = NULL;
     Contact* newContact = NULL;
-    Contact** newContacts = NULL;
+    Contact** newAddressBook = NULL;
     char getBuffer[100] = {"\0"};
     char scanBuffer[100] = {"\0"};
     int numContacts = 0;
@@ -693,25 +707,32 @@ Contact** appendContactsFromFile(Contact** contacts, char* filename)
             myAge = 0;
         }
         newContact->age = myAge;
+
+        /*check to see if this name is already in the book*/
+        if (nameInBook(myFirstName, myFamilyName, contacts))
+        {
+            printf("Duplicate Contact detected\n");
+            free(myFirstName);
+            free(myFamilyName);
+            free(myAddress);
+            free(newContact);
+            continue;
+        }
         
-        newContacts = appendContact(contacts, newContact);
-        contacts = newContacts;
+        newAddressBook = appendContact(contacts, newContact);
+        contacts = newAddressBook;
     }
 
     return contacts;
 }
 
 
+
 // Main function to test the program
 int main() {
-    Contact** addressBook = (Contact**)malloc(sizeof(Contact*));
-    addressBook = insertContactAlphabetical(addressBook, readNewContact());
-    addressBook = insertContactAlphabetical(addressBook, readNewContact());
-    addressBook = insertContactAlphabetical(addressBook, readNewContact());
+    Contact** addressBook = NULL;
 
-    listContacts(addressBook);
-
-    saveContactsToFile(addressBook, "output2.txt");
+    addressBook = appendContact(addressBook, readNewContact());
 
     addressBook = appendContactsFromFile(addressBook, "output.txt");
 

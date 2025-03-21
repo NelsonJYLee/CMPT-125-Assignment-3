@@ -1,24 +1,9 @@
-5
-A
-A
-alsdkfjas
-1231231233
-49
-J
-J
-alkasjfdlka
-1231231233
-49
-Z
-Z
-laskdfjdaskl
-1231231233
-39
+2
 Jane
 Smith
-456 Oak St
-9876543210
-25
+laskdfj
+1231231233
+34
 Alice
 Johnson
 789 Maple Ave
