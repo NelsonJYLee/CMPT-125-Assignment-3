@@ -1,0 +1,44 @@
+Address Book Report
+-------------------
+1. aspen forest
+   Phone: 2222222222
+   Address: 11 park ave
+   Age: 36
+2. cicily seamany
+   Phone: 4444444445
+   Address: pier 23
+   Age: 43
+3. cecil segway
+   Phone: 2342342344
+   Address: downtown
+   Age: 54
+4. zappy shockmaker
+   Phone: 3459876543
+   Address: 46 lolly lane
+   Age: 95
+5. alabaster abalonee
+   Phone: 3453453454
+   Address: seal
+   Age: 21
+6. brassy bolboy
+   Phone: 9897989798
+   Address: ffffff
+   Age: 45
+7. calvin cavern
+   Phone: 3838383838
+   Address: underground
+   Age: 55
+8. sherman salesa
+   Phone: 3456789066
+   Address: oooooo
+   Age: 11
+9. slippery snappery
+   Phone: 5830594860
+   Address: lakep
+   Age: 65
+10. driver  capston
+   Phone: 5969685859
+   Address: boulder
+   Age: 27
+-------------------
+Total Contacts: 10
