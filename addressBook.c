@@ -604,10 +604,10 @@ void printContactsToFile(Contact** contacts, char* filename)
         fprintf(outputStream, "%d. %s %s\n", i + 1, contacts[i]->firstName, contacts[i]->familyName);
         fprintf(outputStream, "   Phone: %lld\n", contacts[i]->phonNum);
         fprintf(outputStream, "   Address: %s\n", contacts[i]->address);
-        fprintf(outputStream, "   Age: %d\n", contacts[i]->age);
+        fprintf(outputStream, "   Age: %d\n\n", contacts[i]->age);
     }
     fprintf(outputStream, "-------------------\n");
-    fprintf(outputStream, "Total Contacts: %d", numContacts);
+    fprintf(outputStream, "Total Contacts: %d\n", numContacts);
 
     printf("Contacts printed to %s (human-readable format).\n", filename);
 
