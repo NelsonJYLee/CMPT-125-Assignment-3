@@ -42,6 +42,8 @@ void InsertionSort(Contact** contacts);
 
 Contact **mergeContactsFromFile(Contact** contacts, char* filename);
 
+Contact** editContact(Contact** contacts, int index );
+
 int main()
 {
 
@@ -963,6 +965,117 @@ Contact **mergeContactsFromFile(Contact** contacts, char* filename)
     printf("Appended contacts from %s\n", filename);
     return contacts;
 }
+
+void printEditMenu()
+{
+    printf("1. Edit First Name\n");
+    printf("2. Edit Last Name\n");
+    printf("3. Edit Address\n");
+    printf("4. Edit Phone Number\n");
+    printf("5. Edit Age\n");
+    printf("6. Cancel\n");
+    printf("Choose an option: ");
+}
+
+Contact** editContact(Contact** contacts)
+{
+    int numContacts = countContacts(contacts);
+    int index = 0;
+    Contact* selectedContact = NULL;
+    int option = 0;
+    char scanBuffer[100] = {"\0"};
+    char* myFirstName = NULL;
+    char* myFamilyName = NULL;
+    char* myAddress = NULL;
+    long long myPhoneNumber = 0;
+    int myAge = 0;
+
+    if (numContacts == 0)
+    {
+        printf("No contacts available to edit\n");
+        return contacts;
+    }
+
+    printf("Enter index of contact to edit (0-%d): ", numContacts-1);
+    if (scanf("%d", &index) != 1 || !(0 <= index && index <= numContacts-1))
+    {
+        fprintf(stderr, "Error: Invalid Index");
+        return contacts;
+    }
+
+    selectedContact = contacts[index];
+    
+    printf("Editing contact: %s %s\n", selectedContact->firstName, selectedContact->familyName);
+
+    printEditMenu();
+    scanf("%d", &option);
+
+    switch(option)
+    {
+        case 1:
+            printf("Enter new first name: ");
+            scanf("%s", scanBuffer);
+            selectedContact->firstName = (char*)realloc(selectedContact->firstName, (strlen(scanBuffer) + 1) * sizeof(char));
+            if (selectedContact == NULL)
+            {
+                fprintf(stderr, "Error: Memory allocation error for string in editContact");
+                return NULL;
+            }
+            strcpy(selectedContact->firstName, scanBuffer);
+            break;
+        case 2:
+            printf("Enter new family name: ");
+            scanf("%s", scanBuffer);
+            selectedContact->familyName = (char*)realloc(selectedContact->familyName, (strlen(scanBuffer) + 1) * sizeof(char));
+            if (selectedContact == NULL)
+            {
+                fprintf(stderr, "Error: Memory allocation error for string in editContact");
+                return NULL;
+            }
+            strcpy(selectedContact->familyName, scanBuffer);
+            break;
+        case 3:
+            printf("Enter new address: ");
+            fscanf(stdin, " %99[^\n]", scanBuffer);
+            selectedContact->address = (char*)realloc(selectedContact->address, (strlen(scanBuffer) + 1) * sizeof(char));
+            if (selectedContact == NULL)
+            {
+                fprintf(stderr, "Error: Memory allocation error for string in editContact");
+                return NULL;
+            }
+            strcpy(selectedContact->address, scanBuffer);
+            break;
+        case 4:
+            printf("Enter new phone number: Enter 10-digit phone number that must not start with 0: ");
+            fscanf(stdin, " %99[^\n]", scanBuffer);
+            if (!(validPhoneNumber(scanBuffer)))
+            {
+                fprintf(stderr, "Error: Invalid phone number.\n");
+                return contacts;
+            }
+            else
+            {
+                myPhoneNumber = atoll(scanBuffer);
+            }
+            selectedContact->phonNum = myPhoneNumber;
+            break;
+        case 5:
+            printf("Enter new age: ");
+            fscanf(stdin, "%d", &myAge);
+            if (!(myAge >= 1 && myAge <= 150))
+            {
+                fprintf(stderr, "Error: Invalid age.");
+                return contacts;
+            }
+            selectedContact->age = myAge;
+            break;
+        case 6:
+            printf("Edit cancelled\n");
+    }
+    return contacts;
+}
+
+
 
 
 
