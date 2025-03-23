@@ -1,8 +1,41 @@
+/*
+Author: Nelson Lee
+Date: March 22nd, 2025
+Description: This C program implements an address book application in C that uses dynamic memory allocation 
+to manage a list of contacts.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
+
+enum MenuOption 
+{
+    APPEND_CONTACT_OPTION = 1,
+    INSERT_ALPHA_OPTION,
+    REMOVE_CONTACT_OPTION,
+    REMOVE_CONTACT_NAME,
+    FIND_EDIT_CONTACT_OPTION,
+    LIST_CONTACT_OPTION,
+    PRNT_FILE_OPTION,
+    PRNT_FILE_HR_OPTION,
+    LOAD_CONTACTS_OPTION,
+    APPEND_FILE_OPTION,
+    MERGE_FILE_OPTION,
+    EXIT_OPTION
+};
+
+enum EditOption 
+{
+    EDIT_FIRST = 1,
+    EDIT_LAST,
+    EDIT_ADDR,
+    EDIT_PHN,
+    EDIT_AGE,
+    CANCEL
+};
 
 typedef struct Contact {
     char* firstName;
@@ -56,19 +89,7 @@ int main()
     int option = 0;
     Contact** addressBook = NULL;
     Contact** newAddressBook = NULL;
-    const int EXIT_OPTION = 12;
-    const int APPEND_CONTACT_OPTION = 1;
-    const int INSERT_ALPHA_OPTION = 2;
-    const int REMOVE_CONTACT_OPTION = 3;
-    const int REMOVE_CONTACT_NAME = 4;
-    const int FIND_EDIT_CONTACT_OPTION = 5;
-    const int LIST_CONTACT_OPTION = 6;
-    const int PRNT_FILE_OPTION = 7;
     char filename[100] = {"\0"};
-    const int PRNT_FILE_HR_OPTION = 8;
-    const int LOAD_CONTACTS_OPTION = 9;
-    const int APPEND_FILE_OPTION = 10;
-    const int MERGE_FILE_OPTION = 11;
 
     /*
     start by adding the NULL ending to the array
@@ -146,7 +167,6 @@ int main()
         printf("\n");
     }
     return 0;
-
 }
 
 void printMenuOptions()
@@ -187,6 +207,8 @@ bool validPhoneNumber(char buffer[])
 bool validAge(char buffer[])
 {
     int myAge = 0;
+    const int MAX_AGE = 150;
+    const int MIN_AGE = 1;
     for (int i = 0; i < strlen(buffer); i++)
     {
         if (!isdigit(buffer[i]))
@@ -195,7 +217,7 @@ bool validAge(char buffer[])
         }
     }
     myAge = atoi(buffer);
-    if (!(myAge >= 1 && myAge <= 150))
+    if (!(myAge >= MIN_AGE && myAge <= MAX_AGE))
     {
         return false;
     }
@@ -611,11 +633,11 @@ void printContactsToFile(Contact** contacts, char* filename)
 
     printf("Contacts printed to %s (human-readable format).\n", filename);
 
+    fclose(outputStream);
+
     return;
 }
 
-
-/*check and test this big function*/
 Contact** loadContactsFromFile(Contact** addressBook, char* filename)
 {
     FILE* inputStream = NULL;
@@ -628,6 +650,8 @@ Contact** loadContactsFromFile(Contact** addressBook, char* filename)
     char* myAddress = NULL;
     long long myPhoneNumber = 0;
     int myAge = 0;
+    const int MAX_AGE = 150;
+    const int MIN_AGE = 1;
 
 
     inputStream = fopen(filename, "r");
@@ -735,7 +759,7 @@ Contact** loadContactsFromFile(Contact** addressBook, char* filename)
         /*age*/
         fgets(getBuffer, sizeof(getBuffer), inputStream);
         sscanf(getBuffer, "%d", &myAge);
-        if (!(myAge >= 1 && myAge <= 150))
+        if (!(myAge >= MIN_AGE && myAge <= MAX_AGE))
         {
             fprintf(stderr, "Error: Invalid age.");
             myAge = 0;
@@ -776,6 +800,8 @@ Contact** appendContactsFromFile(Contact** contacts, char* filename)
     char* myAddress = NULL;
     long long myPhoneNumber = 0;
     int myAge = 0;
+    const int MAX_AGE = 150;
+    const int MIN_AGE = 1;
     
     inputStream = fopen(filename, "r");
     if (inputStream == NULL)
@@ -866,7 +892,7 @@ Contact** appendContactsFromFile(Contact** contacts, char* filename)
         /*age*/
         fgets(getBuffer, sizeof(getBuffer), inputStream);
         sscanf(getBuffer, "%d", &myAge);
-        if (!(myAge >= 1 && myAge <= 150))
+        if (!(myAge >= MIN_AGE && myAge <= MAX_AGE))
         {
             fprintf(stderr, "Error: Invalid age.");
             myAge = 0;
@@ -905,8 +931,9 @@ Contact **mergeContactsFromFile(Contact** contacts, char* filename)
     char* myAddress = NULL;
     long long myPhoneNumber = 0;
     int myAge = 0;
+    const int MAX_AGE = 150;
+    const int MIN_AGE = 1;
 
-    /*read and place contacts from file in a sorted manner*/
     inputStream = fopen(filename, "r");
     if (inputStream == NULL)
     {
@@ -994,7 +1021,7 @@ Contact **mergeContactsFromFile(Contact** contacts, char* filename)
         /*age*/
         fgets(getBuffer, sizeof(getBuffer), inputStream);
         sscanf(getBuffer, "%d", &myAge);
-        if (!(myAge >= 1 && myAge <= 150))
+        if (!(myAge >= MIN_AGE && myAge <= MAX_AGE))
         {
             fprintf(stderr, "Error: Invalid age.");
             myAge = 0;
@@ -1042,6 +1069,8 @@ Contact** editContact(Contact** contacts)
     char* myAddress = NULL;
     long long myPhoneNumber = 0;
     int myAge = 0;
+    const int MAX_AGE = 150;
+    const int MIN_AGE = 1;
 
     if (numContacts == 0)
     {
@@ -1065,7 +1094,7 @@ Contact** editContact(Contact** contacts)
 
     switch(option)
     {
-        case 1:
+        case EDIT_FIRST:
             printf("Enter new first name: ");
             scanf("%s", scanBuffer);
             selectedContact->firstName = (char*)realloc(selectedContact->firstName, (strlen(scanBuffer) + 1) * sizeof(char));
@@ -1076,7 +1105,7 @@ Contact** editContact(Contact** contacts)
             }
             strcpy(selectedContact->firstName, scanBuffer);
             break;
-        case 2:
+        case EDIT_LAST:
             printf("Enter new family name: ");
             scanf("%s", scanBuffer);
             selectedContact->familyName = (char*)realloc(selectedContact->familyName, (strlen(scanBuffer) + 1) * sizeof(char));
@@ -1087,7 +1116,7 @@ Contact** editContact(Contact** contacts)
             }
             strcpy(selectedContact->familyName, scanBuffer);
             break;
-        case 3:
+        case EDIT_ADDR:
             printf("Enter new address: ");
             fscanf(stdin, " %99[^\n]", scanBuffer);
             selectedContact->address = (char*)realloc(selectedContact->address, (strlen(scanBuffer) + 1) * sizeof(char));
@@ -1098,7 +1127,7 @@ Contact** editContact(Contact** contacts)
             }
             strcpy(selectedContact->address, scanBuffer);
             break;
-        case 4:
+        case EDIT_PHN:
             printf("Enter new phone number: Enter 10-digit phone number that must not start with 0: ");
             fscanf(stdin, " %99[^\n]", scanBuffer);
             if (!(validPhoneNumber(scanBuffer)))
@@ -1112,24 +1141,23 @@ Contact** editContact(Contact** contacts)
             }
             selectedContact->phonNum = myPhoneNumber;
             break;
-        case 5:
+        case EDIT_AGE:
             printf("Enter new age: ");
             fscanf(stdin, "%d", &myAge);
-            if (!(myAge >= 1 && myAge <= 150))
+            if (!(myAge >= MIN_AGE && myAge <= MAX_AGE))
             {
                 fprintf(stderr, "Error: Invalid age.");
                 return contacts;
             }
             selectedContact->age = myAge;
             break;
-        case 6:
+        case CANCEL:
             printf("Edit cancelled.\n");
             return contacts;
     }
     printf("Contact updated successfully.\n");
     return contacts;
 }
-
 
 
 
